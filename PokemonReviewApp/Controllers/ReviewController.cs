@@ -133,27 +133,24 @@ namespace PokemonReviewApp.Controllers
         }
 
 
-        [HttpDelete("{reviewId}")]
+        [HttpDelete("/DeleteReviewsByReviewer/{reviewerId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteReview(int reviewId)
+        public IActionResult DeleteReviewsByReviewer(int reviewerId)
         {
-            if (!_reviewRepository.ReviewExists(reviewId))
-            {
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
                 return NotFound();
-            }
 
-            var reviewToDelete = _reviewRepository.GetReview(reviewId);
-
+            var reviewsToDelete = _reviewerRepository.GetReviewsByReviewer(reviewerId).ToList();
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest();
 
-            if (!_reviewRepository.DeleteReview(reviewToDelete))
+            if (!_reviewRepository.DeleteReviews(reviewsToDelete))
             {
-                ModelState.AddModelError("", "Something went wrong deleting review");
+                ModelState.AddModelError("", "error deleting reviews");
+                return StatusCode(500, ModelState);
             }
-
             return NoContent();
         }
     }
